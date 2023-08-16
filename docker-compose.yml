@@ -1,0 +1,24 @@
+version: '3'
+
+services: 
+    api:
+        build: .
+        ports: 
+            - "${PORT}:${PORT}"
+        volumes:
+            - /app/node_modules
+            - .:/app
+        environment:
+            - CHOKIDAR_USEPOLLING=true
+            - PORT=${PORT}
+            - SERVER_URL=${SERVER_URL}
+            - MONGO_URI=${MONGO_URI}
+            - ACTIVE_TOKEN_SECRET=${ACTIVE_TOKEN_SECRET}
+            - ACCESS_TOKEN_SECRET=${ACCESS_TOKEN_SECRET}
+            - REFRESH_TOKEN_SECRET=${REFRESH_TOKEN_SECRET}
+            - MAIL_CLIENT_ID=${MAIL_CLIENT_ID}
+            - MAIL_CLIENT_SECRET=${MAIL_CLIENT_SECRET}
+            - MAIL_REFRESH_TOKEN=${MAIL_REFRESH_TOKEN}
+            - MAIL_ADDRESS=${MAIL_ADDRESS}
+            - SENDER_EMAIL=${SENDER_EMAIL}
+            - SENDER_PASSWORD=${SENDER_PASSWORD}

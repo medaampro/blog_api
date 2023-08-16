@@ -4,11 +4,10 @@ const {generate_active_token, verify_active_token,
        generate_access_token, verify_access_token, 
        generate_refresh_token, verify_refresh_token}         = require("../helpers/tokens");
 const {send_email}                                           = require("../helpers/email");
+const {get_user}                                             = require("../helpers/google_api");
 const {validate_username, validate_email, validate_password} = require("../helpers/validation");
 
 const bcrypt = require("bcrypt");
-const {OAuth2Client} = require("google-auth-library");
-const client = new OAuth2Client(`${process.env.CLIENT_ID}`);
 
 exports.signup = async (req, res) => 
 {
@@ -32,9 +31,10 @@ exports.signup = async (req, res) =>
         if(!hashed_password) return res.status(400).json({errors: "error, please retry !!"});
 
         const active_token = generate_active_token({username, email, password: hashed_password});
-        const url = `${process.env.SERVER_URL}/activate/${active_token}`;
+        const url = `${process.env.SERVER_URL}/api/activate/${active_token}`;
 
         const result = await send_email(email, url, "verify your email address.");
+
         res.json({msg: "signup success ! please check your email."});
     }
     catch(err)
@@ -106,7 +106,7 @@ exports.signout = async (req, res) =>
     {
         res.clearCookie("refresh_token", {path: "/api/refresh"});
 
-        const user = await User.findOneAndUpdate({_id: req.user._id}, {refresh_token: ''});
+        const user = await User.findOneAndUpdate({_id: req.user._id}, {refresh_token: ""});
         if(!user) return res.status(404).json({errors: "error, please retry !!"});
 
         res.json({msg: "signout success !!"});
@@ -154,17 +154,13 @@ exports.refresh_token_signin = async (req, res) =>
 
 exports.google_signin = async (req, res) => 
 {
-/*
-    const {id_token} = req.body;
-    if(!id_token) return res.status(404).json({errors: "please signin !!"}); 
-*/
-    try 
+    const {id_token, access_token} = req.body;
+    if(!id_token || !access_token) return res.status(404).json({errors: "please signin !!"}); 
+
+    try
     {
-/*
-        const verify = await client.verifyIdToken({idToken: id_token, audience: `${process.env.MAIL_CLIENT_ID}`});
-        const {name, email, email_verified} = verify.getPayload();
-        if(!email_verified) return res.status(500).json({errors: "email verification failed !!"}); 
-*/
+        const {name, email, verified_email} = await get_user(id_token, access_token);
+        if(!verified_email) return res.status(500).json({errors: "email verification failed !!"}); 
 
         const user = await User.findOne({email});
 

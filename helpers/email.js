@@ -1,33 +1,24 @@
-const nodemailer       = require("nodemailer");
-const {OAuth2Client}   = require("google-auth-library");
-const OAUTH_PLAYGROUND = "https://developers.google.com/oauthplayground";
+const nodemailer = require("nodemailer");
 
-async function send_email(receiver_email, url, text)
+function send_email(receiver_email, url, text)
 {
-    const oAuth2Client = new OAuth2Client(`${process.env.MAIL_CLIENT_ID}`, `${process.env.MAIL_CLIENT_SECRET}`, OAUTH_PLAYGROUND);
-    oAuth2Client.setCredentials({refresh_token: `${process.env.MAIL_REFRESH_TOKEN}`});
-
-    const access_token = await oAuth2Client.getAccessToken();
-
     const transport = nodemailer.createTransport(
     {
+        host: "smtp.gmail.com",
         service: "gmail",
-        auth: 
-        {
-            type: "oauth2",
-            user: `${process.env.SENDER_EMAIL_ADDRESS}`,
-            clientId: `${process.env.MAIL_CLIENT_ID}`,
-            clientSecret: `${process.env.MAIL_CLIENT_SECRET}`,
-            refreshToken: `${process.env.MAIL_REFRESH_TOKEN}`,
-            accessToken: access_token
+        port: 465,
+        secure: true,
+        auth: {
+            user: `${process.env.SENDER_EMAIL}`,
+            pass: `${process.env.SENDER_PASSWORD}`
         }
     });
 
     const mailOptions = 
     {
-        from: `${process.env.SENDER_EMAIL}`,
+        from: `${process.env.SENDER_EMAIl}`,
         to: receiver_email,
-        subject: "Blog app",
+        subject: "blog api",
         html: 
         `
             <h3>${text}</h3> 
@@ -35,9 +26,9 @@ async function send_email(receiver_email, url, text)
         `
     };
 
-    const result = await transport.sendMail(mailOptions);
-
-    return result;
+    return transport.sendMail(mailOptions)
+            .then(res => res)
+            .catch(error => {throw new Error(error.message)});
 }
 
 module.exports = {send_email};
