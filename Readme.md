@@ -1,6 +1,6 @@
 ## Introduction:
 
-blog API, built for learning purposes.
+blog api, built for learning purposes.
 
 
 ## Main features:
@@ -31,15 +31,15 @@ blog API, built for learning purposes.
 #### Prerequisites
 
 node & npm & docker & docker-compose installed.\
-to use google login you need to setup the app on google cloud console, follow this ([tutorial](https://www.youtube.com/watch?v=idqhYcXxbPs)).
+to use google login you need to setup the app on google cloud console, follow this [tutorial](https://www.youtube.com/watch?v=idqhYcXxbPs).
 
 #### Clone & Setup environment variable
 
 run the following commands: 
 
 ```
-git clone git@github.com:medaampro/blog_app.git
-cd blog_app && touch .env
+git clone git@github.com:medaampro/blog_api.git
+cd blog_api && touch .env
 ```
 
 add thoses lines to .env file:
